@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22...3.28)
-project(STM32F446RE_CubeMX_CMake_Demo VERSION 1.0 LANGUAGES ASM C CXX)
+project(STM32F446RE_PWM_Demo VERSION 1.0 LANGUAGES ASM C CXX)
 
 # Use the arm-none-eabi toolchain
 # set(CMAKE_TOOLCHAIN_FILE arm-none-eabi.cmake)
