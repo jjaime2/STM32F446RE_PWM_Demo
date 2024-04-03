@@ -5,3 +5,4 @@
 void sysClock_Config();
 void GPIO_Config();
 void delay(uint32_t time);
+void TIM9_Config();

@@ -4,12 +4,10 @@
 int main() {
   sysClock_Config();
   GPIO_Config();
+  TIM9_Config();
 
   while (true) {
-    GPIOA->BSRR |= GPIO_BSRR_BS5;
-    delay(4000000);
-    GPIOA->BSRR |= GPIO_BSRR_BR5;
-    delay(4000000);
+    continue;
   }
 }
 
@@ -62,10 +60,48 @@ void GPIO_Config() {
   // Set pin PA5 as general purpose output mode
   GPIOA->MODER |= (1 << GPIO_MODER_MODER5_Pos);
 
-  // Configure the output mode
+  // Configure PA5 output mode
   GPIOA->OTYPER |= (0 << GPIO_OTYPER_OT5_Pos);
   GPIOA->OSPEEDR |= (2 << GPIO_OSPEEDR_OSPEED5_Pos);
   GPIOA->PUPDR &= ~(3 << GPIO_PUPDR_PUPD5_Pos);
+
+  // Set pin PA2 as alternate function mode
+  GPIOA->MODER |= (2 << GPIO_MODER_MODER2_Pos);
+
+  // Configure PA2 output mode
+  GPIOA->OSPEEDR |= (2 << GPIO_OSPEEDR_OSPEED2_Pos);
+  GPIOA->AFR[1] |= (3 << 4);
+}
+
+void TIM9_Config(uint16_t psc, uint16_t arr) {
+  // Enable TIM9 peripheral clock
+  RCC->APB2ENR |= RCC_APB2ENR_TIM9EN;
+
+  // Set timing parameters
+  TIM9->PSC = psc - 1;
+  TIM9->ARR = arr;
+  TIM9->CCR1 = arr / 2;
+
+  // Set PWM mode and enable output compare preload register
+  TIM9->CCMR1 |= (6 << TIM_CCMR1_OC1M_Pos);
+  TIM9->CCMR1 |= TIM_CCMR1_OC1PE;
+
+  // Enable auto-reload preload register
+  TIM9->CR1 |= TIM_CR1_ARPE;
+
+  // Configure signal polarity and enable CC output
+  TIM9->CCER &= ~TIM_CCER_CC1P;
+  TIM9->CCER |= TIM_CCER_CC1E;
+
+  // Set interrupt source
+  TIM9->CR1 |= TIM_CR1_URS;
+
+  // Load register data to hardware
+  TIM9->EGR |= TIM_EGR_UG;
+
+  // Configure and enable interrupt
+  TIM9->DIER |= (TIM_DIER_CC1IE | TIM_DIER_UIE);
+  TIM9->SR &= ~(TIM_SR_CC1IF | TIM_SR_UIF);
 }
 
 void delay(uint32_t time) {
