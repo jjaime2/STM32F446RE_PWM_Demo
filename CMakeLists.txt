@@ -97,3 +97,24 @@ add_custom_command(TARGET ${EXECUTABLE}
   COMMAND arm-none-eabi-objcopy -O ihex ${EXECUTABLE} ${PROJECT_NAME}.hex
   COMMAND arm-none-eabi-objcopy -O binary ${EXECUTABLE} ${PROJECT_NAME}.bin
 )
+
+add_custom_target(flash DEPENDS ${PROJECT_NAME}.bin)
+add_custom_command(TARGET flash
+  USES_TERMINAL
+  COMMAND st-flash --reset write ${PROJECT_NAME}.bin 0x8000000
+)
+
+add_custom_target(debug DEPENDS ${PROJECT_NAME}.bin
+  COMMAND arm-none-eabi-gdb -tui -command ${CMAKE_SOURCE_DIR}/remote.gdbconf ${PROJECT_NAME}.o 
+)
+
+add_custom_target(debug-server DEPENDS ${PROJECT_NAME}.bin)
+add_custom_command(TARGET debug-server
+  # COMMAND st-util
+  COMMAND gnome-terminal -- st-util
+)
+
+add_custom_target(erase)
+add_custom_command(TARGET erase
+  COMMAND st-flash erase
+)
