@@ -4,7 +4,7 @@
 int main() {
   sysClock_Config();
   GPIO_Config();
-  TIM9_Config();
+  TIM9_Config(1000, 50000);
 
   while (true) {
     continue;
